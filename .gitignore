@@ -1,0 +1,38 @@
+# Environment
+node_modules/
+.env
+.env.local
+.env.*.local
+*.log
+dist/
+build/
+
+# Backend
+backend/dist/
+backend/node_modules/
+backend/.typeorm-config
+backend/ormconfig.json
+
+# Frontend
+frontend/dist/
+frontend/node_modules/
+frontend/.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PWA
+frontend/sw.js
+frontend/workbox-*.js
+
+# Testing
+coverage/
+.nyc_output/
