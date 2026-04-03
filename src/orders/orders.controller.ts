@@ -4,6 +4,7 @@ import {
   Get,
   Patch,
   Delete,
+  Logger,
   Param,
   Body,
   Query,
@@ -27,6 +28,8 @@ import { NotificationsService } from '../notifications/notifications.service';
 
 @Controller('orders')
 export class OrdersController {
+  private readonly logger = new Logger(OrdersController.name);
+
   constructor(
     private ordersService: OrdersService,
     @Inject(forwardRef(() => NotificationsService))
@@ -78,10 +81,12 @@ export class OrdersController {
     @Req() req: { on: (event: string, cb: () => void) => void },
   ): Promise<Observable<MessageEvent>> {
     const dpId: string = user.id;
+    this.logger.log(`SSE connected: assigned/stream dpId=${dpId}`);
     const stream = this.notificationsService.getDpStream(dpId);
     const orders = await this.ordersService.getAssignedOrders(dpId);
 
     req.on('close', () => {
+      this.logger.log(`SSE disconnected: assigned/stream dpId=${dpId}`);
       this.notificationsService.closeDpStream(dpId);
     });
 
