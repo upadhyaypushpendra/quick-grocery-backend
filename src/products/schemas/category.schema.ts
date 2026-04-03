@@ -22,5 +22,4 @@ export class Category {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
-CategorySchema.index({ slug: 1 });
 CategorySchema.index({ parentId: 1 });

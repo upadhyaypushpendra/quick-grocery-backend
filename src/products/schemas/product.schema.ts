@@ -55,7 +55,6 @@ export const ProductSchema = SchemaFactory.createForClass(Product);
 // Enhanced text search index - prioritizes name > tags > description
 ProductSchema.index({ name: 'text', tags: 'text', brand: 'text', description: 'text' }, { weights: { name: 10, tags: 5, brand: 8, description: 1 } });
 ProductSchema.index({ categoryId: 1 });
-ProductSchema.index({ slug: 1 });
 ProductSchema.index({ inStock: 1 });
 ProductSchema.index({ brand: 1 });
 ProductSchema.index({ tags: 1 });
