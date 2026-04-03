@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsEnum, Matches } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsEnum, IsString, Matches } from 'class-validator';
 import { UserRole } from '../../users/entities/user.entity';
 
 // Only these roles can self-register — admin must be created manually
@@ -12,11 +12,13 @@ export class RegisterDto {
   })
   identifier: string;
 
-  @IsNotEmpty()
-  firstName: string;
+  @IsOptional()
+  @IsString()
+  firstName?: string;
 
-  @IsNotEmpty()
-  lastName: string;
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 
   @IsOptional()
   @IsEnum(REGISTRABLE_ROLES, {

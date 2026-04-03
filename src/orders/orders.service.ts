@@ -129,8 +129,6 @@ export class OrdersService {
       Number(activeOrder.deliveryLongitude),
     );
 
-    console.log('Distance to delivery location:', distance, 'km');
-
     if (distance <= OrdersService.REACHED_RADIUS_KM) {
       await this.updateOrderStatus(
         activeOrder.id,

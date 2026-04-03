@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { LoggerMiddleware } from './common/logger.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import configuration from './config/configuration';
@@ -34,4 +35,12 @@ import { OrderRequestsModule } from './order-requests/order-requests.module';
     OrderRequestsModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .exclude({ path: 'api/orders/assigned/stream', method: RequestMethod.GET })
+      .exclude({ path: 'api/order-requests/listen', method: RequestMethod.GET })
+      .forRoutes('*');
+  }
+}

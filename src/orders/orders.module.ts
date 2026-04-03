@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order, OrderItem, OrderStatusEvent } from './entities/order.entity';
 import { OrdersService } from './orders.service';
@@ -10,6 +10,7 @@ import { AuthModule } from '../auth/auth.module';
 import { Address } from '../users/entities/address.entity';
 import { Location } from '../location/entities/location.entity';
 import { User } from '../users/entities/user.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { User } from '../users/entities/user.entity';
     ProductsModule,
     WalletModule,
     AuthModule,
+    forwardRef(() => NotificationsModule),
   ],
   providers: [OrdersService],
   controllers: [OrdersController],

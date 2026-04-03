@@ -49,8 +49,8 @@ export class AuthService {
     const user = this.userRepo.create({
       identifier: dto.identifier,
       identifierType,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
+      firstName: dto.firstName ?? '',
+      lastName: dto.lastName ?? '',
       role,
     });
 

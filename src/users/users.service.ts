@@ -6,6 +6,11 @@ import { Address } from './entities/address.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
+export class UpdateProfileDto {
+  firstName?: string;
+  lastName?: string;
+}
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -18,6 +23,11 @@ export class UsersService {
       where: { id: userId },
       relations: ['addresses'],
     });
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    await this.userRepo.update({ id: userId }, dto);
+    return this.userRepo.findOne({ where: { id: userId } });
   }
 
   async getAddresses(userId: string) {

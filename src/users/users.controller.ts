@@ -18,13 +18,18 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('user')
+@Roles('user', 'delivery_partner')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get('profile')
   async getProfile(@CurrentUser() user: any) {
     return this.usersService.getProfile(user.id);
+  }
+
+  @Patch('profile')
+  async updateProfile(@CurrentUser() user: any, @Body() body: { firstName?: string; lastName?: string }) {
+    return this.usersService.updateProfile(user.id, body);
   }
 
   @Get('addresses')

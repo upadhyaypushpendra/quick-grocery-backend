@@ -9,35 +9,48 @@ import {
   Query,
   UseGuards,
   BadRequestException,
+  Sse,
+  Req,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
+import { Observable, concat, of } from 'rxjs';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtSseGuard } from '../auth/guards/jwt-sse.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatus } from './entities/order.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Controller('orders')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class OrdersController {
-  constructor(private ordersService: OrdersService) {}
+  constructor(
+    private ordersService: OrdersService,
+    @Inject(forwardRef(() => NotificationsService))
+    private notificationsService: NotificationsService,
+  ) {}
 
   // ── Customer endpoints ────────────────────────────────────────────────────
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('user')
   async createOrder(@CurrentUser() user: any, @Body() dto: CreateOrderDto) {
     return this.ordersService.createOrder(user.id, dto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('user')
   async getOrders(@CurrentUser() user: any) {
     return this.ordersService.getOrders(user.id);
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('user')
   async getOrder(@CurrentUser() user: any, @Param('id') orderId: string) {
     const order = await this.ordersService.getOrderById(orderId, user.id);
@@ -50,12 +63,36 @@ export class OrdersController {
   // ── Delivery partner endpoints ────────────────────────────────────────────
 
   @Get('assigned/list')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('delivery_partner')
   async getAssignedOrders(@CurrentUser() user: any) {
     return this.ordersService.getAssignedOrders(user.id);
   }
 
+  @Get('assigned/stream')
+  @Sse()
+  @UseGuards(JwtSseGuard, RolesGuard)
+  @Roles('delivery_partner')
+  async assignedOrdersStream(
+    @CurrentUser() user: any,
+    @Req() req: { on: (event: string, cb: () => void) => void },
+  ): Promise<Observable<MessageEvent>> {
+    const dpId: string = user.id;
+    const stream = this.notificationsService.getDpStream(dpId);
+    const orders = await this.ordersService.getAssignedOrders(dpId);
+
+    req.on('close', () => {
+      this.notificationsService.closeDpStream(dpId);
+    });
+
+    return concat(
+      of({ data: JSON.stringify({ type: 'orders', orders }) } as MessageEvent),
+      stream.asObservable(),
+    );
+  }
+
   @Get('assigned/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('delivery_partner')
   async getAssignedOrder(
     @CurrentUser() user: any,
@@ -69,6 +106,7 @@ export class OrdersController {
   }
 
   @Patch(':id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('delivery_partner')
   async updateStatus(
     @CurrentUser() user: any,
@@ -82,6 +120,7 @@ export class OrdersController {
   }
 
   @Post(':id/delivered')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('delivery_partner')
   async markDelivered(@CurrentUser() user: any, @Param('id') orderId: string) {
     return this.ordersService.markDelivered(orderId, user.id);
@@ -90,12 +129,14 @@ export class OrdersController {
   // ── Admin endpoints ───────────────────────────────────────────────────────
 
   @Get('admin/stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async adminOrderStats() {
     return this.ordersService.adminGetOrderStats();
   }
 
   @Get('admin/list')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async adminListOrders(
     @Query('page') page = '1',
@@ -110,12 +151,14 @@ export class OrdersController {
   }
 
   @Get('admin/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async adminGetOrder(@Param('id') orderId: string) {
     return this.ordersService.adminGetOrderById(orderId);
   }
 
   @Delete('admin/:id/cancel')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async adminCancelOrder(@Param('id') orderId: string) {
     return this.ordersService.adminCancelOrder(orderId);

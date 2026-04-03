@@ -32,10 +32,10 @@ export class User {
   @Column({ type: 'enum', enum: IdentifierType, nullable: true })
   identifierType: IdentifierType;
 
-  @Column()
+  @Column({ default: '' })
   firstName: string;
 
-  @Column()
+  @Column({ default: '' })
   lastName: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
