@@ -19,6 +19,8 @@ import { OtpModule } from './otp/otp.module';
 import { WalletModule } from './wallet/wallet.module';
 import { LocationModule } from './location/location.module';
 import { OrderRequestsModule } from './order-requests/order-requests.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { OrderRequestsModule } from './order-requests/order-requests.module';
     LocationModule,
     OrderRequestsModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

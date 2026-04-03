@@ -6,10 +6,7 @@ import { Location } from './entities/location.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Location]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Location]), AuthModule],
   controllers: [LocationController],
   providers: [LocationService],
   exports: [LocationService],

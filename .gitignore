@@ -1,6 +1,7 @@
 # Environment
 node_modules/
 .env
+.env.prod
 .env.local
 .env.*.local
 *.log
