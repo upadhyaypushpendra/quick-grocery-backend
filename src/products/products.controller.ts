@@ -36,7 +36,7 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get('admin/categories')
-  async getAdminCategories() {
+  async getAdminCategories(): Promise<any[]> {
     return this.productsService.findAllCategoriesGrouped();
   }
 

@@ -264,7 +264,7 @@ export class ProductsService {
 
   // ── Admin: Category CRUD ──────────────────────────────────────────────────
 
-  async findAllCategoriesGrouped() {
+  async findAllCategoriesGrouped(): Promise<any[]> {
     const all = await this.categoryModel.find().sort({ sortOrder: 1 }).lean();
     const parents = all.filter((c) => !c.parentId);
     return parents.map((parent) => ({
